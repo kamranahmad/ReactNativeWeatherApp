@@ -5,15 +5,38 @@ import { AppRegistry,StyleSheet, Text, View, StatusBar  } from 'react-native';
 import React, { Component } from 'react';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import {fetchWeather} from './weatherAPI';
 
 class App extends Component {
+    componentWillMount() {
+        this.state = {
+            // hideStatusBar:false
+            temp:0,
+            weather:'Clear'
+        }
+    }
+    componentDidMount() {
+        this.getLocation();
+    }
+    getLocation() {
+        navigator.geolocation.getCurrentPosition(
+            (posData) => fetchWeather(posData.coords.latitude, posData.coords.longitude)
+                .then(res => this.setState({
+                    temp:res.temp,
+                    weather:res.weather
+                })),
+            (error) => console.log(error),
+            {timeout:10000}
+        )
+    }
     render() {
+        //console.log("component render");
         return (
             <View style={styles.container}>
                 <StatusBar hidden={true}/>
                 <View style={styles.header}>
                     <Icon name={'ios-sunny'} size={80} color={'white'}/>
-                    <Text style={styles.temp}>24°</Text>
+                    <Text style={styles.temp}>{this.state.temp}°</Text>
                 </View>
                 <View style={styles.body}>
                     <Text style={styles.title}>
